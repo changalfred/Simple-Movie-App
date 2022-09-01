@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Simple Movie App</string>
+    <string name="app_name">Popular Movies</string>
+
+    <!-- Details fragment screen -->
+    <string name="released_on">Released on %1$s</string>
+    <string name="earned_revenue">Earned %1$s in revenue</string>
 </resources>
