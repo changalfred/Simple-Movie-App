@@ -1,6 +1,7 @@
 package com.example.simplemovieapp.data
 
 import com.example.simplemovieapp.data.network.RetrofitInstance
+import com.example.simplemovieapp.utils.Constants
 
 class MoviesRepository {
 
@@ -8,7 +9,7 @@ class MoviesRepository {
     suspend fun getPopularMovies(
         language: String?,
         page: Int?,
-        region: String
-    ) = RetrofitInstance.vehicleService.getPopularMovies("", language, page, region)
+        region: String?
+    ) = RetrofitInstance.vehicleService.getPopularMovies(Constants.API_KEY, language, page, region)
 
 }
