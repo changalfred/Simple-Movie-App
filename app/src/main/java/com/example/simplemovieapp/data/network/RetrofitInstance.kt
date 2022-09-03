@@ -17,7 +17,7 @@ object RetrofitInstance {
         .build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl(Constants.BASE_URL)
+        .baseUrl(Constants.TMDB_BASE_URL)
         .client(loggingClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
