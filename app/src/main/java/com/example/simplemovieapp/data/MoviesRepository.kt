@@ -10,6 +10,6 @@ class MoviesRepository {
         language: String?,
         page: Int?,
         region: String?
-    ) = RetrofitInstance.vehicleService.getPopularMovies(Constants.API_KEY, language, page, region)
+    ) = RetrofitInstance.vehicleService.getPopularMovies(Constants.TMDB_API_KEY, language, page, region)
 
 }

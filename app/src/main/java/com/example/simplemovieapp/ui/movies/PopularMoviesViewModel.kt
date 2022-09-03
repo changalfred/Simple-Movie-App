@@ -5,7 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simplemovieapp.data.MoviesRepository
-import com.example.simplemovieapp.data.network.models.PopularMovies
+import com.example.simplemovieapp.ui.models.Movie
+import com.example.simplemovieapp.ui.models.asUiModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -13,8 +14,8 @@ class PopularMoviesViewModel : ViewModel() {
 
     private val moviesRepository = MoviesRepository()
 
-    private val _popularMovies = MutableLiveData<PopularMovies>()
-    val popularMovies: LiveData<PopularMovies> = _popularMovies
+    private val _popularMovies = MutableLiveData<List<Movie>>()
+    val popularMovies: LiveData<List<Movie>> = _popularMovies
 
     fun getPopularMovies(
         language: String?,
@@ -23,7 +24,10 @@ class PopularMoviesViewModel : ViewModel() {
     = viewModelScope.launch {
         try {
             val response = moviesRepository.getPopularMovies(language, page, region)
-            _popularMovies.postValue(response.body())
+
+            Timber.d("Response body after as ui model: ${response.body()?.asUiModel()}")
+
+            _popularMovies.postValue(response.body()?.asUiModel())
         } catch (e: Exception) {
             Timber.d("Exception: ${e.message}")
         }

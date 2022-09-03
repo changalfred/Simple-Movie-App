@@ -18,7 +18,7 @@
         android:name="com.example.simplemovieapp.ui.displaymoviedetails.DisplayMovieDetailsFragment"
         android:label="{title}" >
         <argument
-            android:name="title"
-            app:argType="string" />
+            android:name="id"
+            app:argType="integer" />
     </fragment>
 </navigation>
