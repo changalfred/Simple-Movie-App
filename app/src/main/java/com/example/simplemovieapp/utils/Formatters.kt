@@ -40,7 +40,7 @@ object Formatters {
             return stringBuilder.toString()
         }
 
-        return ""
+        return "0"
     }
 
 }

@@ -10,7 +10,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.simplemovieapp.databinding.ItemMovieBinding
 import com.example.simplemovieapp.ui.models.UiMovieModel
 import com.example.simplemovieapp.utils.Constants
-import timber.log.Timber
 
 
 class MoviesAdapter constructor(private val movieItemClickListener: OnMovieClickListener) :
@@ -56,8 +55,6 @@ class MoviesAdapter constructor(private val movieItemClickListener: OnMovieClick
 
             fun bind(movie: UiMovieModel) {
                 binding.apply {
-                    Timber.d("Poster path: ${Constants.TMDB_IMAGE_BASE_URL + movie.posterPath}")
-
                     Glide.with(binding.root)
                         .load(Constants.TMDB_IMAGE_BASE_URL + Constants.W185 + "/" + movie.posterPath)
                         .diskCacheStrategy(DiskCacheStrategy.DATA)
