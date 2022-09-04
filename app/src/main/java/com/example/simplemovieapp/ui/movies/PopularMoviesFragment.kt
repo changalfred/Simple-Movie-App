@@ -124,12 +124,12 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
 
     private fun hideProgressBar() {
         isLoading = false
-        binding.progressBar.isVisible = false
+        binding.progressCircular.isVisible = false
     }
 
     private fun showProgressBar() {
         isLoading = true
-        binding.progressBar.isVisible = true
+        binding.progressCircular.isVisible = true
     }
 
 }
