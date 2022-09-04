@@ -16,9 +16,12 @@
     <fragment
         android:id="@+id/displayMovieDetailsFragment"
         android:name="com.example.simplemovieapp.ui.displaymoviedetails.DisplayMovieDetailsFragment"
-        android:label="{title}" >
+        android:label="{title}">
         <argument
             android:name="id"
             app:argType="integer" />
+        <argument
+            android:name="title"
+            app:argType="string" />
     </fragment>
 </navigation>

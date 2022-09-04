@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.simplemovieapp.databinding.ItemMovieBinding
-import com.example.simplemovieapp.ui.models.Movie
+import com.example.simplemovieapp.ui.models.UiMovieModel
 import com.example.simplemovieapp.utils.Constants
 import timber.log.Timber
 
@@ -16,11 +16,11 @@ import timber.log.Timber
 class MoviesAdapter constructor(private val movieItemClickListener: OnMovieClickListener) :
     RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
 
-    private val diffCallback = object : DiffUtil.ItemCallback<Movie>() {
-        override fun areItemsTheSame(oldItem: Movie, newItem: Movie) =
+    private val diffCallback = object : DiffUtil.ItemCallback<UiMovieModel>() {
+        override fun areItemsTheSame(oldItem: UiMovieModel, newItem: UiMovieModel) =
             oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: Movie, newItem: Movie) =
+        override fun areContentsTheSame(oldItem: UiMovieModel, newItem: UiMovieModel) =
             oldItem == newItem
     }
 
@@ -40,13 +40,26 @@ class MoviesAdapter constructor(private val movieItemClickListener: OnMovieClick
 
     inner class MovieViewHolder(private val binding: ItemMovieBinding) :
         RecyclerView.ViewHolder(binding.root) {
+            init {
+                binding.apply {
+                    root.setOnClickListener {
+                        val itemPosition = adapterPosition
 
-            fun bind(movie: Movie) {
+                        if (itemPosition != RecyclerView.NO_POSITION) {
+                            val id = differ.currentList[itemPosition].id
+                            val title = differ.currentList[itemPosition].title
+                            movieItemClickListener.onMovieClick(id, title)
+                        }
+                    }
+                }
+            }
+
+            fun bind(movie: UiMovieModel) {
                 binding.apply {
                     Timber.d("Poster path: ${Constants.TMDB_IMAGE_BASE_URL + movie.posterPath}")
 
                     Glide.with(binding.root)
-                        .load(Constants.TMDB_IMAGE_BASE_URL + movie.posterPath)
+                        .load(Constants.TMDB_IMAGE_BASE_URL + Constants.W185 + "/" + movie.posterPath)
                         .diskCacheStrategy(DiskCacheStrategy.DATA)
                         .into(binding.imageviewMoviePoster)
 
@@ -58,7 +71,7 @@ class MoviesAdapter constructor(private val movieItemClickListener: OnMovieClick
     }
 
     interface OnMovieClickListener {
-        fun onMovieClick(movie: Movie)
+        fun onMovieClick(id: Int, title: String)
     }
 
 }
