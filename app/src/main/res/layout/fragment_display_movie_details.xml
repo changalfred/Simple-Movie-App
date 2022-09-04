@@ -3,39 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_theme_surface"
+    android:background="@color/dark_theme_surface_details"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-<!--        <FrameLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:id="@+id/framelayout_images"-->
-<!--            app:layout_constraintTop_toTopOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent">-->
-
-<!--            <ImageView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:id="@+id/imageview_movie_backdrop"-->
-<!--                tools:ignore="ContentDescription"-->
-<!--                tools:src="@drawable/ic_launcher_foreground" />-->
-
-<!--            <ImageView-->
-<!--                android:layout_width="100dp"-->
-<!--                android:layout_height="145dp"-->
-<!--                android:id="@+id/imageview_movie_poster"-->
-<!--                android:layout_marginStart="25dp"-->
-<!--                android:layout_marginTop="165dp"-->
-<!--                android:scaleType="centerCrop"-->
-<!--                tools:src="@mipmap/ic_launcher"-->
-<!--                tools:ignore="ContentDescription" />-->
-
-<!--        </FrameLayout>-->
 
         <ImageView
             android:layout_width="match_parent"
