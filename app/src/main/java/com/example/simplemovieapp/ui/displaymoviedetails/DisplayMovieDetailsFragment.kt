@@ -48,8 +48,8 @@ class DisplayMovieDetailsFragment : Fragment(R.layout.fragment_display_movie_det
                 .into(imageviewMoviePoster)
 
             textviewRating.text = movieDetails.toString()
-            textviewReleaseDate.text = "Released on ${movieDetails.releaseDate}"
-            textviewRevenue.text = "Grossed $${movieDetails.revenue}"
+            textviewReleaseDate.text = requireContext().getString(R.string.release_date, movieDetails.releaseDate)
+            textviewRevenue.text = requireContext().getString(R.string.revenue, movieDetails.revenue)
             textviewMovieOverview.text = movieDetails.overview
             textviewRating.text = movieDetails.rating.toString()
         }

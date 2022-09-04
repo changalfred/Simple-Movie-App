@@ -8,7 +8,7 @@ object Constants {
 
     // Movie image sizes
     const val W185 = "w185"
-    const val W500 = "w500"
+    const val W500 = "w1280"
 
     // Query limit per network request
     const val QUERY_SIZE_LIMIT = 20
