@@ -1,15 +1,20 @@
 package com.example.simplemovieapp.data
 
 import com.example.simplemovieapp.data.network.RetrofitInstance
-import com.example.simplemovieapp.utils.Constants
 
 class MoviesRepository {
 
     // Network calls.
     suspend fun getPopularMovies(
+        apiKey: String,
         language: String?,
         page: Int?,
         region: String?
-    ) = RetrofitInstance.vehicleService.getPopularMovies(Constants.TMDB_API_KEY, language, page, region)
+    ) = RetrofitInstance.moviesService.getPopularMovies(apiKey, language, page, region)
 
+    suspend fun getMovieDetails(
+        id: Int,
+        apiKey: String,
+        language: String?
+    ) = RetrofitInstance.moviesService.getMovieDetails(id, apiKey, language)
 }

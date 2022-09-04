@@ -22,6 +22,6 @@ object RetrofitInstance {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val vehicleService: MoviesService = retrofit.create(MoviesService::class.java)
+    val moviesService: MoviesService = retrofit.create(MoviesService::class.java)
 
 }
