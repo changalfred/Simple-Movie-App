@@ -11,6 +11,7 @@ import com.example.simplemovieapp.R
 import com.example.simplemovieapp.databinding.FragmentDisplayMovieDetailsBinding
 import com.example.simplemovieapp.ui.models.UiMovieDetailsModel
 import com.example.simplemovieapp.utils.Constants
+import com.example.simplemovieapp.utils.Formatters
 
 class DisplayMovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
 
@@ -47,11 +48,10 @@ class DisplayMovieDetailsFragment : Fragment(R.layout.fragment_display_movie_det
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(imageviewMoviePoster)
 
-            textviewRating.text = movieDetails.toString()
-            textviewReleaseDate.text = requireContext().getString(R.string.release_date, movieDetails.releaseDate)
-            textviewRevenue.text = requireContext().getString(R.string.revenue, movieDetails.revenue)
+            textviewRating.text = Formatters.roundToNearestTenth(movieDetails.rating).toString()
+            textviewReleaseDate.text = requireContext().getString(R.string.release_date, Formatters.formatDate(movieDetails.releaseDate))
+            textviewRevenue.text = requireContext().getString(R.string.revenue, Formatters.formatWithCommas(movieDetails.revenue))
             textviewMovieOverview.text = movieDetails.overview
-            textviewRating.text = movieDetails.rating.toString()
         }
     }
 
