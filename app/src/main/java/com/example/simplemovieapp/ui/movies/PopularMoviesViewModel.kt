@@ -54,16 +54,18 @@ class PopularMoviesViewModel : ViewModel() {
         response.body()?.let { movies ->
             popularMoviesPage++
 
-            if (popularMoviesResponse == null) {
-                popularMoviesResponse = movies.asUiModel()
+            popularMoviesResponse = if (popularMoviesResponse == null) {
+                movies.asUiModel()
             } else {
                 val oldMovies = popularMoviesResponse
-                val newMovies = movies.asUiModel()
+                val newMovies = movies.asUiModel()      // Better to use asUiModel() in the repository than here.
                 val newList = mutableListOf<UiMovieModel>()
                 oldMovies?.let { newList.addAll(oldMovies) }
                 newList.addAll(newMovies)
-
-                popularMoviesResponse = newList
+                
+                newList     // For some reason, can't just return newList on line 69 but have to assign newList to popularMoviesResponse
+                            // and return that. May have something to do with newList being local var. but popularMoviesResponse being
+                            // global var.
             }
 
             return popularMoviesResponse as List<UiMovieModel>

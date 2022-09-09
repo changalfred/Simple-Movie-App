@@ -27,6 +27,7 @@ object Formatters {
         }
     }
 
+    // Always return currency value as a long and not a string.
     fun formatWithCommas(arg: Int): String {
         if (arg.toString().length >= 3) {
             val stringBuilder = StringBuilder(arg.toString())

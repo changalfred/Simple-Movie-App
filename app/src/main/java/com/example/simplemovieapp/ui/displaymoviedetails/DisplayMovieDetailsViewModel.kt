@@ -20,7 +20,6 @@ class DisplayMovieDetailsViewModel : ViewModel() {
     fun getMovieDetails(id: Int, apiKey: String, language: String?) = viewModelScope.launch {
         try {
             val response = moviesRepository.getMovieDetails(id, apiKey, language)
-            Timber.d("Movie details response: ${response.body()}")
             _movieDetails.postValue(response.body()?.asUiModel())
         } catch (e: Exception) {
             Timber.d("Exception: ${e.message}")
