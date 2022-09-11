@@ -4,10 +4,12 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class UiMovieModel(
+data class UiMovieDetails(
+    val title: String,
+    val backdropPath: String,
     val posterPath: String,
     val overview: String,
-    val id: Int,
-    val title: String,
+    val releaseDate: String,
+    val revenue: Int,
     val rating: Double
 ) : Parcelable

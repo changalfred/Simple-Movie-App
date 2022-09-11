@@ -1,17 +1,20 @@
 package com.example.simplemovieapp.ui.movies
 
+import android.app.Application
 import android.os.Bundle
 import android.view.View
 import android.widget.AbsListView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.simplemovieapp.R
 import com.example.simplemovieapp.databinding.FragmentMoviesBinding
+import com.example.simplemovieapp.ui.movies.viewmodels.PopularMoviesViewModel
+import com.example.simplemovieapp.ui.movies.viewmodels.PopularMoviesViewModelProviderFactory
 import com.example.simplemovieapp.utils.Constants.QUERY_SIZE_LIMIT
 
 class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
@@ -19,12 +22,11 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
 
     private lateinit var binding: FragmentMoviesBinding
     private lateinit var moviesAdapter: MoviesAdapter
+    private lateinit var popularMoviesViewModel: PopularMoviesViewModel
 
     private var isScrolling = false
     private var isLastPage = false
     private var isLoading = false
-
-    private val popularMoviesViewModel: PopularMoviesViewModel by viewModels()
 
     // Pagination
     private val scrollListener = object : RecyclerView.OnScrollListener() {
@@ -71,6 +73,7 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
         binding = FragmentMoviesBinding.bind(view)
         moviesAdapter = MoviesAdapter(this)
 
+        setupViewModel()
         setupRecyclerView()
         setupObservables()
         getPopularMovies()
@@ -82,6 +85,15 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
 
     private fun getPopularMovies() =
         popularMoviesViewModel.getPopularMovies(getString(R.string.tmdb_api_key), "en-US", "US")
+
+    private fun setupViewModel() {
+        val viewModelProviderFactory =
+            PopularMoviesViewModelProviderFactory(context?.applicationContext as Application)
+        popularMoviesViewModel = ViewModelProvider(
+            this,
+            viewModelProviderFactory
+        )[PopularMoviesViewModel::class.java]
+    }
 
     private fun setupRecyclerView() {
         binding.recyclerviewMovies.apply {
