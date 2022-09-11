@@ -8,18 +8,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.simplemovieapp.databinding.ItemMovieBinding
-import com.example.simplemovieapp.ui.models.UiMovieModel
+import com.example.simplemovieapp.ui.models.UiMovie
 import com.example.simplemovieapp.utils.Constants
 
 
 class MoviesAdapter constructor(private val movieItemClickListener: OnMovieClickListener) :
     RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
 
-    private val diffCallback = object : DiffUtil.ItemCallback<UiMovieModel>() {
-        override fun areItemsTheSame(oldItem: UiMovieModel, newItem: UiMovieModel) =
+    private val diffCallback = object : DiffUtil.ItemCallback<UiMovie>() {
+        override fun areItemsTheSame(oldItem: UiMovie, newItem: UiMovie) =
             oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: UiMovieModel, newItem: UiMovieModel) =
+        override fun areContentsTheSame(oldItem: UiMovie, newItem: UiMovie) =
             oldItem == newItem
     }
 
@@ -53,7 +53,7 @@ class MoviesAdapter constructor(private val movieItemClickListener: OnMovieClick
                 }
             }
 
-            fun bind(movie: UiMovieModel) {
+            fun bind(movie: UiMovie) {
                 binding.apply {
                     Glide.with(binding.root)
                         .load(Constants.TMDB_IMAGE_BASE_URL + Constants.W185 + "/" + movie.posterPath)

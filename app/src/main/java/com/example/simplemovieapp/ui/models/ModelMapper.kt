@@ -3,9 +3,10 @@ package com.example.simplemovieapp.ui.models
 import com.example.simplemovieapp.data.network.models.MovieDetails
 import com.example.simplemovieapp.data.network.models.Movies
 
-fun Movies.asUiModel(): List<UiMovieModel> {
+// Map network model to UI model.
+fun Movies.asUiModel(): List<UiMovie> {
     return results.map { movie ->
-        UiMovieModel(
+        UiMovie(
             posterPath = movie.poster_path,
             overview = movie.overview,
             id = movie.id,
@@ -15,15 +16,16 @@ fun Movies.asUiModel(): List<UiMovieModel> {
     }
 }
 
-fun MovieDetails.asUiModel(): UiMovieDetailsModel {
-    return UiMovieDetailsModel(
-        title = this.originalTitle,
-        backdropPath = this.backdropPath,
-        posterPath = this.posterPath,
-        overview = this.overview,
-        releaseDate = this.releaseDate,
-        revenue = this.revenue,
-        rating = this.rating
+// Map network model to UI model.
+fun MovieDetails.asUiModel(): UiMovieDetails {
+    return UiMovieDetails(
+        title = originalTitle,
+        backdropPath = backdropPath,
+        posterPath = posterPath,
+        overview = overview,
+        releaseDate = releaseDate,
+        revenue = revenue,
+        rating = rating
     )
 }
 
