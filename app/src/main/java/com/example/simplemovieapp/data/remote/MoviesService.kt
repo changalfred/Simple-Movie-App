@@ -1,7 +1,7 @@
-package com.example.simplemovieapp.data.network
+package com.example.simplemovieapp.data.remote
 
-import com.example.simplemovieapp.data.network.models.MovieDetails
-import com.example.simplemovieapp.data.network.models.Movies
+import com.example.simplemovieapp.data.remote.models.MovieDetails
+import com.example.simplemovieapp.data.remote.models.Movies
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

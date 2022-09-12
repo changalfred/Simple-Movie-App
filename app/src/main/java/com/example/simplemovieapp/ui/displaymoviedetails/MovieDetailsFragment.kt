@@ -15,15 +15,12 @@ import com.example.simplemovieapp.ui.displaymoviedetails.viewmodels.MovieDetails
 import com.example.simplemovieapp.ui.models.UiMovieDetails
 import com.example.simplemovieapp.utils.Constants
 import com.example.simplemovieapp.utils.Formatters
-import timber.log.Timber
 
 class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
 
     private lateinit var binding: FragmentDisplayMovieDetailsBinding
     private lateinit var movieDetailsViewModel: MovieDetailsViewModel
     private lateinit var movie: UiMovieDetails
-
-    private var isFavourite = false
 
     private val args: MovieDetailsFragmentArgs by navArgs()
 
@@ -37,7 +34,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
         movieDetailsViewModel.getMovieDetails(args.id, getString(R.string.tmdb_api_key), "en-US")
 
         subscribeToObservables()
-        updateFavouriteButton()
+        updateSaveButton()
         setOnClickListeners()
     }
 
@@ -53,44 +50,36 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
             movie = movieDetails
             bindViews(movieDetails)
         }
-        movieDetailsViewModel.isSaved.observe(viewLifecycleOwner) { favourited ->
-            Timber.d("MovieDetailsFragment: observe favourited: $favourited")
-//            isFavourite = favourited
-            setFavouriteButton(favourited)
+        movieDetailsViewModel.isSaved.observe(viewLifecycleOwner) { isSaved ->
+            setSaveButton(isSaved)
         }
     }
 
-    private fun updateFavouriteButton() {
-        Timber.d("MovieDetailsFragment: updateFavouriteButton()")
-        isFavourited()
+    private fun updateSaveButton() {
+        isSaved()
     }
 
-    private fun isFavourited() {
-        Timber.d("MovieDetailsFragment: isFavourited()")
-        movieDetailsViewModel.checkIfFavourited(args.id)
+    private fun isSaved() {
+        movieDetailsViewModel.checkIfMovieSaved(args.id)
     }
 
-    private fun setFavouriteButton(favourited: Boolean) {
-        if (!favourited) {
-            Timber.d("MovieDetailsFragment: setFavouriteButton(): is NOT favourite")
-            binding.imageviewFavourite.visibility = View.INVISIBLE
-            binding.imageviewFavouriteBorder.visibility = View.VISIBLE
+    private fun setSaveButton(saved: Boolean) {
+        if (!saved) {
+            binding.imageviewSaved.visibility = View.INVISIBLE
+            binding.imageviewNotSaved.visibility = View.VISIBLE
         } else {
-            Timber.d("MovieDetailsFragment: setFavouriteButton(): is favourite")
-            binding.imageviewFavourite.visibility = View.VISIBLE
-            binding.imageviewFavouriteBorder.visibility = View.INVISIBLE
+            binding.imageviewSaved.visibility = View.VISIBLE
+            binding.imageviewNotSaved.visibility = View.INVISIBLE
         }
     }
 
     private fun setOnClickListeners() {
         binding.apply {
-            imageviewFavouriteBorder.setOnClickListener {
-                Timber.d("MovieDetailsFragment: setOnClickListeners(): click border")
-                addToFavourites()
+            imageviewNotSaved.setOnClickListener {
+                addToSaved()
             }
-            imageviewFavourite.setOnClickListener {
-                Timber.d("MovieDetailsFragment: setOnClickListeners(): click non-border")
-                removeFromFavourites()
+            imageviewSaved.setOnClickListener {
+                removeFromSaved()
             }
             imageviewRate.setOnClickListener {
 
@@ -101,16 +90,14 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
         }
     }
 
-    private fun addToFavourites() {
-        Timber.d("MovieDetailsFragment: addToFavourites()")
+    private fun addToSaved() {
         movieDetailsViewModel.saveMovie(movie, args.id)
-        updateFavouriteButton()
+        updateSaveButton()
     }
 
-    private fun removeFromFavourites() {
-        Timber.d("MovieDetailsFragment: removeFromFavourites()")
+    private fun removeFromSaved() {
         movieDetailsViewModel.unsaveMovie(movie, args.id)
-        updateFavouriteButton()
+        updateSaveButton()
     }
 
     private fun bindViews(movieDetails: UiMovieDetails) {

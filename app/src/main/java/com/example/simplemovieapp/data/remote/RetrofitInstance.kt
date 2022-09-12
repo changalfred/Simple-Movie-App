@@ -1,4 +1,4 @@
-package com.example.simplemovieapp.data.network
+package com.example.simplemovieapp.data.remote
 
 import com.example.simplemovieapp.utils.Constants
 import okhttp3.OkHttpClient

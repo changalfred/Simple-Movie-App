@@ -13,4 +13,8 @@ object Constants {
     // Query limit per network request
     const val QUERY_SIZE_LIMIT = 20
 
+    // True/false when checking movie is saved or not
+    const val NOT_SAVED = 0
+    const val SAVED = 1
+
 }

@@ -1,4 +1,4 @@
-package com.example.simplemovieapp.data.network.models
+package com.example.simplemovieapp.data.remote.models
 
 data class ProductionCountry(
     val iso_3166_1: String,

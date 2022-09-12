@@ -1,10 +1,10 @@
-package com.example.simplemovieapp.data.database.models
+package com.example.simplemovieapp.data.local.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "movies")
-data class DbMovie(
+data class SavedMovie(
     @PrimaryKey val id: Int,    // Same as movie id from network model.
     val title: String,
     val backdropPath: String,

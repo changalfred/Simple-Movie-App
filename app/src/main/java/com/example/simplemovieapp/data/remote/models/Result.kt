@@ -1,4 +1,4 @@
-package com.example.simplemovieapp.data.network.models
+package com.example.simplemovieapp.data.remote.models
 
 data class Result(
     val adult: Boolean,

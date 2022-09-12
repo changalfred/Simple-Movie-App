@@ -95,9 +95,9 @@
         <ImageView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/imageview_favourite_border"
+            android:id="@+id/imageview_not_saved"
             android:layout_marginTop="25dp"
-            android:src="@drawable/ic_favourite_border"
+            android:src="@drawable/ic_not_save"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imageview_movie_poster"
@@ -107,9 +107,9 @@
         <ImageView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/imageview_favourite"
+            android:id="@+id/imageview_saved"
             android:layout_marginTop="25dp"
-            android:src="@drawable/ic_favourite"
+            android:src="@drawable/ic_save"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imageview_movie_poster"
@@ -122,9 +122,9 @@
             android:id="@+id/imageview_rate"
             android:src="@drawable/ic_rate"
             app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintTop_toTopOf="@id/imageview_favourite_border"
-            app:layout_constraintBottom_toBottomOf="@id/imageview_favourite_border"
-            app:layout_constraintStart_toEndOf="@id/imageview_favourite_border"
+            app:layout_constraintTop_toTopOf="@id/imageview_not_saved"
+            app:layout_constraintBottom_toBottomOf="@id/imageview_not_saved"
+            app:layout_constraintStart_toEndOf="@id/imageview_not_saved"
             app:layout_constraintEnd_toStartOf="@id/imageview_share"
             tools:ignore="ContentDescription" />
 
@@ -151,7 +151,7 @@
             android:layout_marginTop="25dp"
             android:layout_marginStart="15dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imageview_favourite_border"
+            app:layout_constraintTop_toBottomOf="@id/imageview_not_saved"
             tools:text="Overview" />
 
         <TextView

@@ -28,7 +28,6 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
     private var isLastPage = false
     private var isLoading = false
 
-    // Pagination
     private val scrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
@@ -76,6 +75,7 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
         setupViewModel()
         setupRecyclerView()
         setupObservables()
+        getTotalPages()
         getPopularMovies()
     }
 
@@ -83,6 +83,7 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
         popularMoviesViewModel.onMovieClicked(id, title)
     }
 
+    private fun getTotalPages() = popularMoviesViewModel.getTotalPages(getString(R.string.tmdb_api_key), "en-US", "US")
     private fun getPopularMovies() =
         popularMoviesViewModel.getPopularMovies(getString(R.string.tmdb_api_key), "en-US", "US")
 
@@ -110,13 +111,11 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
             hideProgressBar()
             moviesAdapter.differ.submitList(popularMovies)
         }
-        popularMoviesViewModel.movies.observe(viewLifecycleOwner) { moviesResponse ->
-            val totalPages = moviesResponse.totalPages
+        popularMoviesViewModel.totalPages.observe(viewLifecycleOwner) { totalPages ->
             isLastPage = popularMoviesViewModel.popularMoviesPage == totalPages
         }
 
         // Channels
-        // TODO: What does the next line do?
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             popularMoviesViewModel.moviesEvent.collect { moviesEvent ->
                 // There could be more than one event in future, so using when statement here.

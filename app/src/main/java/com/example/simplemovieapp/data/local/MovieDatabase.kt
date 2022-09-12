@@ -1,12 +1,12 @@
-package com.example.simplemovieapp.data.database
+package com.example.simplemovieapp.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.simplemovieapp.data.database.models.DbMovie
+import com.example.simplemovieapp.data.local.models.SavedMovie
 
-@Database(entities = [DbMovie::class], version = 1)
+@Database(entities = [SavedMovie::class], version = 1)
 abstract class MovieDatabase : RoomDatabase() {
 
     abstract fun getMovieDao(): MovieDao
