@@ -1,27 +1,30 @@
 package com.example.simplemovieapp.data
 
-import com.example.simplemovieapp.data.local.models.SavedMovie
+import com.example.simplemovieapp.data.local.models.MovieCacheEntity
 import com.example.simplemovieapp.data.remote.models.MovieDetails
-import com.example.simplemovieapp.data.remote.models.Movies
-import com.example.simplemovieapp.ui.models.UiMovie
-import com.example.simplemovieapp.ui.models.UiMovieDetails
+import com.example.simplemovieapp.data.remote.models.MoviesNetworkEntity
+import com.example.simplemovieapp.presentation.models.MovieDetailsPresentationEntity
+import com.example.simplemovieapp.presentation.models.MoviePresentationEntity
+import com.example.simplemovieapp.presentation.models.MoviesPresentationEntity
 
-// Remote -> UI
-fun Movies.asUiModel(): List<UiMovie> {
-    return results.map { movie ->
-        UiMovie(
-            posterPath = movie.poster_path,
-            overview = movie.overview,
-            id = movie.id,
-            title = movie.original_title,
-            rating = movie.vote_average
-        )
-    }
+fun MoviesNetworkEntity.asPresentationEntity(): MoviesPresentationEntity {
+    return MoviesPresentationEntity(
+        totalPages = totalPages,
+        movies = movies.map { movie ->
+            MoviePresentationEntity(
+                posterPath = movie.poster_path,
+                overview = movie.overview,
+                id = movie.id,
+                title = movie.original_title,
+                rating = movie.vote_average
+            )
+        }
+    )
 }
 
-// Remote -> UI
-fun MovieDetails.asUiModel(): UiMovieDetails {
-    return UiMovieDetails(
+// TODO: Find a way to rename MovieDetails -> MovieDetailsNetworkEntity (custom GSON builder?)
+fun MovieDetails.asPresentationEntity(): MovieDetailsPresentationEntity {
+    return MovieDetailsPresentationEntity(
         title = originalTitle,
         backdropPath = backdropPath,
         posterPath = posterPath,
@@ -32,9 +35,8 @@ fun MovieDetails.asUiModel(): UiMovieDetails {
     )
 }
 
-// UI -> local
-fun UiMovieDetails.asDbModel(id: Int, isSaved: Boolean): SavedMovie {
-    return SavedMovie(
+fun MovieDetailsPresentationEntity.asDatabaseEntity(id: Int, isSaved: Boolean): MovieCacheEntity {
+    return MovieCacheEntity(
         id = id,
         title = title,
         backdropPath = backdropPath,

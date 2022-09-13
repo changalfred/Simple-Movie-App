@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "movies")
-data class SavedMovie(
+data class MovieCacheEntity(
     @PrimaryKey val id: Int,    // Same as movie id from network model.
     val title: String,
     val backdropPath: String,

@@ -1,6 +1,6 @@
 package com.example.simplemovieapp.data.remote
 
-import com.example.simplemovieapp.utils.Constants
+import com.example.simplemovieapp.utilities.TMDB_BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -17,7 +17,7 @@ object RetrofitInstance {
         .build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl(Constants.TMDB_BASE_URL)
+        .baseUrl(TMDB_BASE_URL)
         .client(loggingClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()

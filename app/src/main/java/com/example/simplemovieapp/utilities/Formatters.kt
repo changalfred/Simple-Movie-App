@@ -1,4 +1,4 @@
-package com.example.simplemovieapp.utils
+package com.example.simplemovieapp.utilities
 
 import android.os.Build
 import java.time.LocalDate

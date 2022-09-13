@@ -1,4 +1,4 @@
-package com.example.simplemovieapp.ui.movies
+package com.example.simplemovieapp.presentation.movies
 
 import android.app.Application
 import android.os.Bundle
@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.simplemovieapp.R
 import com.example.simplemovieapp.databinding.FragmentMoviesBinding
-import com.example.simplemovieapp.ui.movies.viewmodels.PopularMoviesViewModel
-import com.example.simplemovieapp.ui.movies.viewmodels.PopularMoviesViewModelProviderFactory
-import com.example.simplemovieapp.utils.Constants.QUERY_SIZE_LIMIT
+import com.example.simplemovieapp.presentation.movies.viewmodels.PopularMoviesViewModel
+import com.example.simplemovieapp.presentation.movies.viewmodels.PopularMoviesViewModelProviderFactory
+import com.example.simplemovieapp.utilities.QUERY_SIZE_LIMIT
 
 class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
     MoviesAdapter.OnMovieClickListener {
@@ -51,7 +51,8 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
             val isNotAtBeginning = firstVisibleItemPosition >= 0
             val isTotalMoreThanVisible = totalItemCount >= QUERY_SIZE_LIMIT
             val shouldPaginate =
-                !isLoading && !isLastPage && isAtLastItem && isNotAtBeginning && isTotalMoreThanVisible && isScrolling
+                !isLoading && !isLastPage && isAtLastItem && isNotAtBeginning &&
+                        isTotalMoreThanVisible && isScrolling
 
             if (shouldPaginate) {
                 showProgressBar()
@@ -75,7 +76,6 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
         setupViewModel()
         setupRecyclerView()
         setupObservables()
-        getTotalPages()
         getPopularMovies()
     }
 
@@ -83,9 +83,9 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
         popularMoviesViewModel.onMovieClicked(id, title)
     }
 
-    private fun getTotalPages() = popularMoviesViewModel.getTotalPages(getString(R.string.tmdb_api_key), "en-US", "US")
     private fun getPopularMovies() =
-        popularMoviesViewModel.getPopularMovies(getString(R.string.tmdb_api_key), "en-US", "US")
+        popularMoviesViewModel.getPopularMovies(getString(R.string.tmdb_api_key),
+            "en-US", "US")
 
     private fun setupViewModel() {
         val viewModelProviderFactory =
@@ -118,7 +118,6 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
         // Channels
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             popularMoviesViewModel.moviesEvent.collect { moviesEvent ->
-                // There could be more than one event in future, so using when statement here.
                 when (moviesEvent) {
                     is PopularMoviesViewModel.MoviesEvent.NavigateToMovieDetailsScreen -> {
                         val action =

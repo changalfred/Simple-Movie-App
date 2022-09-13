@@ -1,4 +1,4 @@
-package com.example.simplemovieapp.ui.displaymoviedetails
+package com.example.simplemovieapp.presentation.displaymoviedetails
 
 import android.app.Application
 import android.os.Bundle
@@ -10,17 +10,19 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.simplemovieapp.R
 import com.example.simplemovieapp.databinding.FragmentDisplayMovieDetailsBinding
-import com.example.simplemovieapp.ui.displaymoviedetails.viewmodels.MovieDetailsViewModel
-import com.example.simplemovieapp.ui.displaymoviedetails.viewmodels.MovieDetailsViewModelProviderFactory
-import com.example.simplemovieapp.ui.models.UiMovieDetails
-import com.example.simplemovieapp.utils.Constants
-import com.example.simplemovieapp.utils.Formatters
+import com.example.simplemovieapp.presentation.displaymoviedetails.viewmodels.MovieDetailsViewModel
+import com.example.simplemovieapp.presentation.displaymoviedetails.viewmodels.MovieDetailsViewModelProviderFactory
+import com.example.simplemovieapp.presentation.models.MovieDetailsPresentationEntity
+import com.example.simplemovieapp.utilities.Formatters
+import com.example.simplemovieapp.utilities.TMDB_IMAGE_BASE_URL
+import com.example.simplemovieapp.utilities.W185
+import com.example.simplemovieapp.utilities.W500
 
 class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
 
     private lateinit var binding: FragmentDisplayMovieDetailsBinding
     private lateinit var movieDetailsViewModel: MovieDetailsViewModel
-    private lateinit var movie: UiMovieDetails
+    private lateinit var movie: MovieDetailsPresentationEntity
 
     private val args: MovieDetailsFragmentArgs by navArgs()
 
@@ -31,7 +33,8 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
 
         setupViewModel()
 
-        movieDetailsViewModel.getMovieDetails(args.id, getString(R.string.tmdb_api_key), "en-US")
+        movieDetailsViewModel.getMovieDetails(args.id, getString(R.string.tmdb_api_key),
+            "en-US")
 
         subscribeToObservables()
         updateSaveButton()
@@ -56,10 +59,6 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
     }
 
     private fun updateSaveButton() {
-        isSaved()
-    }
-
-    private fun isSaved() {
         movieDetailsViewModel.checkIfMovieSaved(args.id)
     }
 
@@ -71,6 +70,16 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
             binding.imageviewSaved.visibility = View.VISIBLE
             binding.imageviewNotSaved.visibility = View.INVISIBLE
         }
+    }
+
+    private fun addToSaved() {
+        movieDetailsViewModel.saveMovie(movie, args.id)
+        updateSaveButton()
+    }
+
+    private fun removeFromSaved() {
+        movieDetailsViewModel.unsaveMovie(movie, args.id)
+        updateSaveButton()
     }
 
     private fun setOnClickListeners() {
@@ -90,25 +99,15 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
         }
     }
 
-    private fun addToSaved() {
-        movieDetailsViewModel.saveMovie(movie, args.id)
-        updateSaveButton()
-    }
-
-    private fun removeFromSaved() {
-        movieDetailsViewModel.unsaveMovie(movie, args.id)
-        updateSaveButton()
-    }
-
-    private fun bindViews(movieDetails: UiMovieDetails) {
+    private fun bindViews(movieDetails: MovieDetailsPresentationEntity) {
         binding.apply {
             Glide.with(this@MovieDetailsFragment)
-                .load(Constants.TMDB_IMAGE_BASE_URL + Constants.W500 + movieDetails.backdropPath)
+                .load(TMDB_IMAGE_BASE_URL + W500 + movieDetails.backdropPath)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(imageviewMovieBackdrop)
 
             Glide.with(this@MovieDetailsFragment)
-                .load(Constants.TMDB_IMAGE_BASE_URL + Constants.W185 + movieDetails.posterPath)
+                .load(TMDB_IMAGE_BASE_URL + W185 + movieDetails.posterPath)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(imageviewMoviePoster)
 

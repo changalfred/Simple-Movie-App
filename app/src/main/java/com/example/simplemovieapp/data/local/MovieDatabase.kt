@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.simplemovieapp.data.local.models.SavedMovie
+import com.example.simplemovieapp.data.local.models.MovieCacheEntity
 
-@Database(entities = [SavedMovie::class], version = 1)
+@Database(entities = [MovieCacheEntity::class], version = 1)
 abstract class MovieDatabase : RoomDatabase() {
 
     abstract fun getMovieDao(): MovieDao

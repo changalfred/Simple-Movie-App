@@ -1,7 +1,7 @@
 package com.example.simplemovieapp.data.remote
 
 import com.example.simplemovieapp.data.remote.models.MovieDetails
-import com.example.simplemovieapp.data.remote.models.Movies
+import com.example.simplemovieapp.data.remote.models.MoviesNetworkEntity
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -15,7 +15,7 @@ interface MoviesService {
         @Query("language") language: String? = "en-US",
         @Query("page") page: Int? = 1,
         @Query("region") region: String? = "US",
-    ): Response<Movies>
+    ): Response<MoviesNetworkEntity>
 
     @GET("movie/{movie_id}")
     suspend fun getMovieDetails(

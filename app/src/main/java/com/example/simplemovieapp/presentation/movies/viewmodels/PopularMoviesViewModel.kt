@@ -1,4 +1,4 @@
-package com.example.simplemovieapp.ui.movies.viewmodels
+package com.example.simplemovieapp.presentation.movies.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.LiveData
@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simplemovieapp.data.MoviesRepository
 import com.example.simplemovieapp.data.local.MovieDatabase
-import com.example.simplemovieapp.ui.models.UiMovie
+import com.example.simplemovieapp.presentation.models.MoviePresentationEntity
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -19,33 +19,19 @@ class PopularMoviesViewModel(
 
     var popularMoviesPage = 1
 
-    private var popularMoviesResponse: List<UiMovie>? = null
+    private var popularMoviesResponse: List<MoviePresentationEntity>? = null
 
     private val database = MovieDatabase.invoke(applicationContext)
     private val moviesRepository = MoviesRepository(database)
 
-    private val _popularMovies = MutableLiveData<List<UiMovie>>()
-    val popularMovies: LiveData<List<UiMovie>> = _popularMovies
+    private val _popularMovies = MutableLiveData<List<MoviePresentationEntity>>()
+    val popularMovies: LiveData<List<MoviePresentationEntity>> = _popularMovies
 
     private val _totalPages = MutableLiveData<Int>()
     val totalPages: LiveData<Int> = _totalPages
 
     private val moviesEventChannel = Channel<MoviesEvent>()
     val moviesEvent = moviesEventChannel.receiveAsFlow()
-
-    // TODO: getTotalPages(...) and getPopularMovies(...) same calls.
-    fun getTotalPages(
-        apiKey: String,
-        language: String?,
-        region: String?
-    ) = viewModelScope.launch {
-        try {
-            val response = moviesRepository.getTotalPages(apiKey, language, popularMoviesPage, region)
-            _totalPages.postValue(response.body()?.totalPages)
-        } catch (e: Exception) {
-            Timber.d("Exception: ${e.message}")
-        }
-    }
 
     fun getPopularMovies(
         apiKey: String,
@@ -59,9 +45,12 @@ class PopularMoviesViewModel(
                 popularMoviesPage,
                 region
             )
-            _popularMovies.postValue(concatPreviousResults(response))
+            // TODO: Solve double postValue(...) by making another class in data layer with first
+            // function that only gets totalPages and second function gets movies.
+            _totalPages.postValue(response?.totalPages)
+            _popularMovies.postValue(concatPreviousResults(response?.movies))
         } catch (e: Exception) {
-            Timber.d("Exception: ${e.message}")
+            Timber.d("Exception: ${e.message}, \n ${e.stackTraceToString()}")
         }
     }
 
@@ -69,7 +58,7 @@ class PopularMoviesViewModel(
         moviesEventChannel.send(MoviesEvent.NavigateToMovieDetailsScreen(id, title))
     }
 
-    private fun concatPreviousResults(response: List<UiMovie>?): List<UiMovie> {
+    private fun concatPreviousResults(response: List<MoviePresentationEntity>?): List<MoviePresentationEntity> {
         response.let { movies ->
             popularMoviesPage++
 
@@ -77,14 +66,14 @@ class PopularMoviesViewModel(
                 movies
             } else {
                 val oldMovies = popularMoviesResponse
-                val newList = mutableListOf<UiMovie>()
+                val newList = mutableListOf<MoviePresentationEntity>()
                 oldMovies?.let { newList.addAll(oldMovies) }
-                newList.addAll(movies as List<UiMovie>)
+                newList.addAll(movies as List<MoviePresentationEntity>)
 
                 newList
             }
 
-            return popularMoviesResponse as List<UiMovie>
+            return popularMoviesResponse as List<MoviePresentationEntity>
         }
     }
 
