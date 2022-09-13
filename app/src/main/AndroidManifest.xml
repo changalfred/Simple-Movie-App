@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.simplemovieapp">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:name=".MovieApplication"
         android:allowBackup="true"
@@ -17,7 +15,7 @@
         android:theme="@style/Theme.SimpleMovieApp"
         tools:targetApi="31">
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,5 +24,7 @@
             </intent-filter>
         </activity>
     </application>
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
