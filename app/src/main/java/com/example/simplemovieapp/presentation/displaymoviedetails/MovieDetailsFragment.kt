@@ -13,10 +13,7 @@ import com.example.simplemovieapp.databinding.FragmentDisplayMovieDetailsBinding
 import com.example.simplemovieapp.presentation.displaymoviedetails.viewmodels.MovieDetailsViewModel
 import com.example.simplemovieapp.presentation.displaymoviedetails.viewmodels.MovieDetailsViewModelProviderFactory
 import com.example.simplemovieapp.presentation.models.MovieDetailsPresentationEntity
-import com.example.simplemovieapp.utilities.Formatters
-import com.example.simplemovieapp.utilities.TMDB_IMAGE_BASE_URL
-import com.example.simplemovieapp.utilities.W185
-import com.example.simplemovieapp.utilities.W500
+import com.example.simplemovieapp.utilities.*
 
 class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
 
@@ -48,13 +45,25 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
             ViewModelProvider(this, viewModelProviderFactory)[MovieDetailsViewModel::class.java]
     }
 
+    private fun updateScreen(result: ResourceState<MovieDetailsPresentationEntity>) {
+        when (result) {
+            is ResourceState.Success -> {
+                movie = result.data!!
+                bindViews(result.data)
+            }
+            is ResourceState.Error -> {
+
+            }
+            else -> Unit
+        }
+    }
+
     private fun subscribeToObservables() {
         movieDetailsViewModel.movieDetails.observe(viewLifecycleOwner) { movieDetails ->
-            movie = movieDetails
-            bindViews(movieDetails)
+            updateScreen(movieDetails)
         }
         movieDetailsViewModel.isSaved.observe(viewLifecycleOwner) { isSaved ->
-            setSaveButton(isSaved)
+            setSaveButton(isSaved.data!!)
         }
     }
 

@@ -10,6 +10,7 @@ import com.example.simplemovieapp.data.asDatabaseEntity
 import com.example.simplemovieapp.data.local.MovieDatabase
 import com.example.simplemovieapp.presentation.models.MovieDetailsPresentationEntity
 import com.example.simplemovieapp.utilities.NOT_SAVED
+import com.example.simplemovieapp.utilities.ResourceState
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -21,27 +22,31 @@ class MovieDetailsViewModel(
     private val database = MovieDatabase.invoke(applicationContext)
     private val repository = MoviesRepository(database)
 
-    private val _movieDetails = MutableLiveData<MovieDetailsPresentationEntity>()
-    val movieDetails: LiveData<MovieDetailsPresentationEntity> = _movieDetails
+    private val _movieDetails = MutableLiveData<ResourceState<MovieDetailsPresentationEntity>>()
+    val movieDetails: LiveData<ResourceState<MovieDetailsPresentationEntity>> = _movieDetails
 
-    private val _isSaved = MutableLiveData<Boolean>()
-    val isSaved: LiveData<Boolean> = _isSaved
+    private val _isSaved = MutableLiveData<ResourceState<Boolean>>()
+    val isSaved: LiveData<ResourceState<Boolean>> = _isSaved
 
     fun getMovieDetails(id: Int, apiKey: String, language: String?) = viewModelScope.launch {
         try {
             val response = repository.getMovieDetails(id, apiKey, language)
-            _movieDetails.postValue(response!!)
+            if (response != null) _movieDetails.postValue(ResourceState.Success(response))
         } catch (e: Exception) {
             Timber.d("Exception: ${e.message}")
+            _movieDetails.postValue(ResourceState.Error(null, "Could not fetch movie details."))
         }
     }
 
     fun checkIfMovieSaved(id: Int) = viewModelScope.launch {
         repository.checkIfMovieSaved(id)
-            .catch { e -> Timber.d("Exception: ${e.message}") }
+            .catch { e ->
+                Timber.d("Exception: ${e.message}")
+                _isSaved.postValue(ResourceState.Error(null,"Could not check if movie saved."))
+            }
             .collect { isSaved ->
-                if (isSaved == NOT_SAVED) _isSaved.postValue(false)
-                else _isSaved.postValue(true)
+                if (isSaved == NOT_SAVED) _isSaved.postValue(ResourceState.Success(false))
+                else _isSaved.postValue(ResourceState.Success(true))
             }
     }
 

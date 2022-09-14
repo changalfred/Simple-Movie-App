@@ -1,4 +1,4 @@
-package com.example.simplemovieapp.presentation.movies.viewmodels
+package com.example.simplemovieapp.presentation.displaymovies.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.LiveData
@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.simplemovieapp.data.MoviesRepository
 import com.example.simplemovieapp.data.local.MovieDatabase
 import com.example.simplemovieapp.presentation.models.MoviePresentationEntity
+import com.example.simplemovieapp.utilities.ResourceState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -24,11 +25,11 @@ class PopularMoviesViewModel(
     private val database = MovieDatabase.invoke(applicationContext)
     private val moviesRepository = MoviesRepository(database)
 
-    private val _popularMovies = MutableLiveData<List<MoviePresentationEntity>>()
-    val popularMovies: LiveData<List<MoviePresentationEntity>> = _popularMovies
+    private val _popularMovies = MutableLiveData<ResourceState<List<MoviePresentationEntity>>>()
+    val popularMovies: LiveData<ResourceState<List<MoviePresentationEntity>>> = _popularMovies
 
-    private val _totalPages = MutableLiveData<Int>()
-    val totalPages: LiveData<Int> = _totalPages
+    private val _totalPages = MutableLiveData<ResourceState<Int>>()
+    val totalPages: LiveData<ResourceState<Int>> = _totalPages
 
     private val moviesEventChannel = Channel<MoviesEvent>()
     val moviesEvent = moviesEventChannel.receiveAsFlow()
@@ -38,7 +39,10 @@ class PopularMoviesViewModel(
         language: String?,
         region: String?
     ) = viewModelScope.launch {
+        _popularMovies.postValue(ResourceState.Loading())
+
         try {
+            Timber.d("Try to get movies")
             val response = moviesRepository.getPopularMovies(
                 apiKey,
                 language,
@@ -47,10 +51,14 @@ class PopularMoviesViewModel(
             )
             // TODO: Solve double postValue(...) by making another class in data layer with first
             // function that only gets totalPages and second function gets movies.
-            _totalPages.postValue(response?.totalPages)
-            _popularMovies.postValue(concatPreviousResults(response?.movies))
+            if (response != null) {
+                _totalPages.postValue(ResourceState.Success(response.totalPages))
+                val allMovies = concatPreviousResults(response.movies)
+                _popularMovies.postValue(ResourceState.Success(allMovies))
+            }
         } catch (e: Exception) {
             Timber.d("Exception: ${e.message}, \n ${e.stackTraceToString()}")
+            ResourceState.Error(null, "Could not fetch pages and movies.")
         }
     }
 

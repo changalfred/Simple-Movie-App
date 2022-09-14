@@ -1,4 +1,4 @@
-package com.example.simplemovieapp.presentation.movies
+package com.example.simplemovieapp.presentation.displaymovies
 
 import android.app.Application
 import android.os.Bundle
@@ -13,9 +13,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.simplemovieapp.R
 import com.example.simplemovieapp.databinding.FragmentMoviesBinding
-import com.example.simplemovieapp.presentation.movies.viewmodels.PopularMoviesViewModel
-import com.example.simplemovieapp.presentation.movies.viewmodels.PopularMoviesViewModelProviderFactory
+import com.example.simplemovieapp.presentation.displaymovies.viewmodels.PopularMoviesViewModel
+import com.example.simplemovieapp.presentation.displaymovies.viewmodels.PopularMoviesViewModelProviderFactory
+import com.example.simplemovieapp.presentation.models.MoviePresentationEntity
 import com.example.simplemovieapp.utilities.QUERY_SIZE_LIMIT
+import com.example.simplemovieapp.utilities.ResourceState
+import com.google.android.material.snackbar.Snackbar
+import timber.log.Timber
 
 class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
     MoviesAdapter.OnMovieClickListener {
@@ -105,14 +109,35 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
         }
     }
 
+    private fun updateScreen(result: ResourceState<List<MoviePresentationEntity>>) {
+        when (result) {
+            is ResourceState.Loading -> {
+                Timber.d("Loading")
+                showProgressBar()
+            }
+            is ResourceState.Success -> {
+                Timber.d("Success")
+                hideProgressBar()
+                moviesAdapter.differ.submitList(result.data)
+            }
+            is ResourceState.Error -> {
+                Timber.d("Error")
+                hideProgressBar()
+
+                result.message?.let { message ->
+                    Snackbar.make(requireView(), "Error: $message", Snackbar.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
     private fun setupObservables() {
         // LiveData
         popularMoviesViewModel.popularMovies.observe(viewLifecycleOwner) { popularMovies ->
-            hideProgressBar()
-            moviesAdapter.differ.submitList(popularMovies)
+            updateScreen(popularMovies)
         }
         popularMoviesViewModel.totalPages.observe(viewLifecycleOwner) { totalPages ->
-            isLastPage = popularMoviesViewModel.popularMoviesPage == totalPages
+            isLastPage = popularMoviesViewModel.popularMoviesPage == totalPages.data
         }
 
         // Channels

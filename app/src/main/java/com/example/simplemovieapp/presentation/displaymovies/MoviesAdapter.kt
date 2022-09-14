@@ -1,4 +1,4 @@
-package com.example.simplemovieapp.presentation.movies
+package com.example.simplemovieapp.presentation.displaymovies
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
