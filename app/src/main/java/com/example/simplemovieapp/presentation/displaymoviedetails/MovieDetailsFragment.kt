@@ -112,11 +112,13 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
         binding.apply {
             Glide.with(this@MovieDetailsFragment)
                 .load(TMDB_IMAGE_BASE_URL + W500 + movieDetails.backdropPath)
+                .placeholder(R.drawable.iv_backdrop_placeholder)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(imageviewMovieBackdrop)
 
             Glide.with(this@MovieDetailsFragment)
                 .load(TMDB_IMAGE_BASE_URL + W185 + movieDetails.posterPath)
+                .placeholder(R.drawable.iv_backdrop_placeholder)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(imageviewMoviePoster)
 
