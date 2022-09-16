@@ -5,29 +5,30 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.RequestManager
 import com.example.simplemovieapp.databinding.ItemMovieBinding
 import com.example.simplemovieapp.presentation.models.MoviePresentationEntity
-import com.example.simplemovieapp.utilities.TMDB_IMAGE_BASE_URL
+import com.example.simplemovieapp.utilities.Formatters.buildImageUri
 import com.example.simplemovieapp.utilities.W185
+import javax.inject.Inject
 
 
-class MoviesAdapter constructor(private val movieItemClickListener: OnMovieClickListener) :
-    RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
+class MoviesAdapter @Inject constructor(
+    private val glide: RequestManager,
+) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
+
+    lateinit var movieItemClickListener: OnMovieClickListener
 
     private val diffCallback = object : DiffUtil.ItemCallback<MoviePresentationEntity>() {
         override fun areItemsTheSame(
             oldItem: MoviePresentationEntity,
             newItem: MoviePresentationEntity
-        ) =
-            oldItem.id == newItem.id
+        ) = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
             oldItem: MoviePresentationEntity,
             newItem: MoviePresentationEntity
-        ) =
-            oldItem == newItem
+        ) = oldItem == newItem
     }
 
     val differ = AsyncListDiffer(this, diffCallback)
@@ -46,6 +47,7 @@ class MoviesAdapter constructor(private val movieItemClickListener: OnMovieClick
 
     inner class MovieViewHolder(private val binding: ItemMovieBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         init {
             binding.apply {
                 root.setOnClickListener {
@@ -62,10 +64,8 @@ class MoviesAdapter constructor(private val movieItemClickListener: OnMovieClick
 
         fun bind(movie: MoviePresentationEntity) {
             binding.apply {
-                Glide.with(binding.root)
-                    .load(TMDB_IMAGE_BASE_URL + W185 + "/" + movie.posterPath)
-                    .diskCacheStrategy(DiskCacheStrategy.DATA)
-                    .into(binding.imageviewMoviePoster)
+                glide.load(buildImageUri(W185, movie.posterPath))
+                    .into(imageviewMoviePoster)
 
                 textviewMovieTitle.text = movie.title
                 textviewRating.text = movie.rating.toString()

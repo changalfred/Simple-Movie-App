@@ -1,29 +1,27 @@
 package com.example.simplemovieapp.presentation.displaymovies.viewmodels
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simplemovieapp.data.MoviesRepository
-import com.example.simplemovieapp.data.local.MovieDatabase
 import com.example.simplemovieapp.presentation.models.MoviePresentationEntity
 import com.example.simplemovieapp.utilities.ResourceState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class PopularMoviesViewModel(
-    applicationContext: Application
+@HiltViewModel
+class PopularMoviesViewModel @Inject constructor(
+    private val repository: MoviesRepository
 ) : ViewModel() {
 
     var popularMoviesPage = 1
 
     private var popularMoviesResponse: List<MoviePresentationEntity>? = null
-
-    private val database = MovieDatabase.invoke(applicationContext)
-    private val moviesRepository = MoviesRepository(database)
 
     private val _popularMovies = MutableLiveData<ResourceState<List<MoviePresentationEntity>>>()
     val popularMovies: LiveData<ResourceState<List<MoviePresentationEntity>>> = _popularMovies
@@ -34,21 +32,12 @@ class PopularMoviesViewModel(
     private val moviesEventChannel = Channel<MoviesEvent>()
     val moviesEvent = moviesEventChannel.receiveAsFlow()
 
-    fun getPopularMovies(
-        apiKey: String,
-        language: String?,
-        region: String?
-    ) = viewModelScope.launch {
+    fun getPopularMovies() = viewModelScope.launch {
         _popularMovies.postValue(ResourceState.Loading())
 
         try {
-            Timber.d("Try to get movies")
-            val response = moviesRepository.getPopularMovies(
-                apiKey,
-                language,
-                popularMoviesPage,
-                region
-            )
+            val response = repository.getPopularMovies(page = popularMoviesPage)
+
             // TODO: Solve double postValue(...) by making another class in data layer with first
             // function that only gets totalPages and second function gets movies.
             if (response != null) {
