@@ -111,7 +111,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
             glide.load(buildImageUri(W1280, movieDetails.backdropPath))
                 .into(imageviewMovieBackdrop)
 
-            glide.load(buildImageUri(W185, movieDetails.backdropPath))
+            glide.load(buildImageUri(W185, movieDetails.posterPath))
                 .into(imageviewMoviePoster)
 
             textviewRating.text = Formatters.roundToNearestTenth(movieDetails.rating).toString()
