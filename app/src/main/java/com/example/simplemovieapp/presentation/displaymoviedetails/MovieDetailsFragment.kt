@@ -1,48 +1,45 @@
 package com.example.simplemovieapp.presentation.displaymoviedetails
 
-import android.app.Application
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.RequestManager
 import com.example.simplemovieapp.R
 import com.example.simplemovieapp.databinding.FragmentDisplayMovieDetailsBinding
 import com.example.simplemovieapp.presentation.displaymoviedetails.viewmodels.MovieDetailsViewModel
-import com.example.simplemovieapp.presentation.displaymoviedetails.viewmodels.MovieDetailsViewModelProviderFactory
 import com.example.simplemovieapp.presentation.models.MovieDetailsPresentationEntity
-import com.example.simplemovieapp.utilities.*
+import com.example.simplemovieapp.utilities.Formatters
+import com.example.simplemovieapp.utilities.Formatters.buildImageUri
+import com.example.simplemovieapp.utilities.ResourceState
+import com.example.simplemovieapp.utilities.W1280
+import com.example.simplemovieapp.utilities.W185
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
 
+    @Inject
+    lateinit var glide: RequestManager
+
     private lateinit var binding: FragmentDisplayMovieDetailsBinding
-    private lateinit var movieDetailsViewModel: MovieDetailsViewModel
     private lateinit var movie: MovieDetailsPresentationEntity
 
     private val args: MovieDetailsFragmentArgs by navArgs()
+    private val movieDetailsViewModel: MovieDetailsViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding = FragmentDisplayMovieDetailsBinding.bind(view)
 
-        setupViewModel()
-
-        movieDetailsViewModel.getMovieDetails(args.id, getString(R.string.tmdb_api_key),
-            "en-US")
+        movieDetailsViewModel.getMovieDetails(args.id)
 
         subscribeToObservables()
         updateSaveButton()
         setOnClickListeners()
-    }
-
-    private fun setupViewModel() {
-        val viewModelProviderFactory =
-            MovieDetailsViewModelProviderFactory(context?.applicationContext as Application)
-        movieDetailsViewModel =
-            ViewModelProvider(this, viewModelProviderFactory)[MovieDetailsViewModel::class.java]
     }
 
     private fun updateScreen(result: ResourceState<MovieDetailsPresentationEntity>) {
@@ -110,16 +107,11 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
 
     private fun bindViews(movieDetails: MovieDetailsPresentationEntity) {
         binding.apply {
-            Glide.with(this@MovieDetailsFragment)
-                .load(TMDB_IMAGE_BASE_URL + W500 + movieDetails.backdropPath)
-                .placeholder(R.drawable.iv_backdrop_placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
+
+            glide.load(buildImageUri(W1280, movieDetails.backdropPath))
                 .into(imageviewMovieBackdrop)
 
-            Glide.with(this@MovieDetailsFragment)
-                .load(TMDB_IMAGE_BASE_URL + W185 + movieDetails.posterPath)
-                .placeholder(R.drawable.iv_backdrop_placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
+            glide.load(buildImageUri(W185, movieDetails.backdropPath))
                 .into(imageviewMoviePoster)
 
             textviewRating.text = Formatters.roundToNearestTenth(movieDetails.rating).toString()

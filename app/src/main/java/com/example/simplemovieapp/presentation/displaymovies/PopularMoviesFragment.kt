@@ -1,12 +1,11 @@
 package com.example.simplemovieapp.presentation.displaymovies
 
-import android.app.Application
 import android.os.Bundle
 import android.view.View
 import android.widget.AbsListView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,23 +13,27 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.simplemovieapp.R
 import com.example.simplemovieapp.databinding.FragmentMoviesBinding
 import com.example.simplemovieapp.presentation.displaymovies.viewmodels.PopularMoviesViewModel
-import com.example.simplemovieapp.presentation.displaymovies.viewmodels.PopularMoviesViewModelProviderFactory
 import com.example.simplemovieapp.presentation.models.MoviePresentationEntity
 import com.example.simplemovieapp.utilities.QUERY_SIZE_LIMIT
 import com.example.simplemovieapp.utilities.ResourceState
 import com.google.android.material.snackbar.Snackbar
-import timber.log.Timber
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
     MoviesAdapter.OnMovieClickListener {
 
+    @Inject
+    lateinit var moviesAdapter: MoviesAdapter
+
     private lateinit var binding: FragmentMoviesBinding
-    private lateinit var moviesAdapter: MoviesAdapter
-    private lateinit var popularMoviesViewModel: PopularMoviesViewModel
 
     private var isScrolling = false
     private var isLastPage = false
     private var isLoading = false
+
+    private val popularMoviesViewModel: PopularMoviesViewModel by viewModels()
 
     private val scrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -61,11 +64,7 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
             if (shouldPaginate) {
                 showProgressBar()
 
-                popularMoviesViewModel.getPopularMovies(
-                    getString(R.string.tmdb_api_key),
-                    "en-US",
-                    "US"
-                )
+                popularMoviesViewModel.getPopularMovies()
                 isScrolling = false
             }
         }
@@ -75,9 +74,7 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
         super.onViewCreated(view, savedInstanceState)
 
         binding = FragmentMoviesBinding.bind(view)
-        moviesAdapter = MoviesAdapter(this)
 
-        setupViewModel()
         setupRecyclerView()
         setupObservables()
         getPopularMovies()
@@ -88,21 +85,12 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
     }
 
     private fun getPopularMovies() =
-        popularMoviesViewModel.getPopularMovies(getString(R.string.tmdb_api_key),
-            "en-US", "US")
-
-    private fun setupViewModel() {
-        val viewModelProviderFactory =
-            PopularMoviesViewModelProviderFactory(context?.applicationContext as Application)
-        popularMoviesViewModel = ViewModelProvider(
-            this,
-            viewModelProviderFactory
-        )[PopularMoviesViewModel::class.java]
-    }
+        popularMoviesViewModel.getPopularMovies()
 
     private fun setupRecyclerView() {
         binding.recyclerviewMovies.apply {
             adapter = moviesAdapter
+            moviesAdapter.movieItemClickListener = this@PopularMoviesFragment
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
             addOnScrollListener(this@PopularMoviesFragment.scrollListener)
@@ -112,16 +100,13 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
     private fun updateScreen(result: ResourceState<List<MoviePresentationEntity>>) {
         when (result) {
             is ResourceState.Loading -> {
-                Timber.d("Loading")
                 showProgressBar()
             }
             is ResourceState.Success -> {
-                Timber.d("Success")
                 hideProgressBar()
                 moviesAdapter.differ.submitList(result.data)
             }
             is ResourceState.Error -> {
-                Timber.d("Error")
                 hideProgressBar()
 
                 result.message?.let { message ->

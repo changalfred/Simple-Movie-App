@@ -1,26 +1,24 @@
 package com.example.simplemovieapp.presentation.displaymoviedetails.viewmodels
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simplemovieapp.data.MoviesRepository
 import com.example.simplemovieapp.data.asDatabaseEntity
-import com.example.simplemovieapp.data.local.MovieDatabase
 import com.example.simplemovieapp.presentation.models.MovieDetailsPresentationEntity
 import com.example.simplemovieapp.utilities.NOT_SAVED
 import com.example.simplemovieapp.utilities.ResourceState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class MovieDetailsViewModel(
-    applicationContext: Application
+@HiltViewModel
+class MovieDetailsViewModel @Inject constructor(
+    private val repository: MoviesRepository
 ) : ViewModel() {
-
-    private val database = MovieDatabase.invoke(applicationContext)
-    private val repository = MoviesRepository(database)
 
     private val _movieDetails = MutableLiveData<ResourceState<MovieDetailsPresentationEntity>>()
     val movieDetails: LiveData<ResourceState<MovieDetailsPresentationEntity>> = _movieDetails
@@ -28,9 +26,9 @@ class MovieDetailsViewModel(
     private val _isSaved = MutableLiveData<ResourceState<Boolean>>()
     val isSaved: LiveData<ResourceState<Boolean>> = _isSaved
 
-    fun getMovieDetails(id: Int, apiKey: String, language: String?) = viewModelScope.launch {
+    fun getMovieDetails(id: Int) = viewModelScope.launch {
         try {
-            val response = repository.getMovieDetails(id, apiKey, language)
+            val response = repository.getMovieDetails(id)
             if (response != null) _movieDetails.postValue(ResourceState.Success(response))
         } catch (e: Exception) {
             Timber.d("Exception: ${e.message}")

@@ -44,4 +44,11 @@ object Formatters {
         return "0"
     }
 
+    fun buildImageUri(dims: String, path: String) =
+        StringBuilder(TMDB_IMAGE_BASE_URL)
+            .append(dims)
+            .append(SLASH)
+            .append(path)
+            .toString()
+
 }
