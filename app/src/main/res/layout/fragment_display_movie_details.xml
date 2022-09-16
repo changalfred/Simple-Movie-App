@@ -163,7 +163,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="25dp"
-            android:text="Overview"
+            android:text="@string/details_header_overview"
             android:textColor="@color/white"
             android:textSize="24sp"
             android:textStyle="bold"

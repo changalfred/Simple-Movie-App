@@ -4,4 +4,5 @@
     <!-- Details fragment screen -->
     <string name="release_date">Release \u0020\u0020\u0020\u0020\u0020 %1$s</string>
     <string name="revenue">Revenue \u0020\u0020\u0020\u0020 $%1$s</string>
+    <string name="details_header_overview">Overview</string>
 </resources>
