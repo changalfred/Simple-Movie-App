@@ -4,7 +4,6 @@ import android.content.Context
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.example.simplemovieapp.R
 import com.example.simplemovieapp.data.MoviesRepository
 import com.example.simplemovieapp.data.local.MovieDatabase
 import com.example.simplemovieapp.data.remote.MoviesService
@@ -30,7 +29,7 @@ object AppModule {
         @ApplicationContext context: Context
     ) = Glide.with(context).setDefaultRequestOptions(
         RequestOptions()
-            .placeholder(R.drawable.ic_image_placeholder)
+//            .placeholder(R.layout.placeholder_movie_image)
             .diskCacheStrategy(DiskCacheStrategy.DATA)
     )
 

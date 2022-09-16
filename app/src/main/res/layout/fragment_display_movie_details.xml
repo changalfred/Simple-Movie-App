@@ -10,15 +10,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <include layout="@layout/placeholder_movie_image"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:id="@+id/placeholder_movie_backdrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/imageview_movie_backdrop"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription"
-            tools:src="@drawable/ic_launcher_foreground" />
+            tools:ignore="ContentDescription" />
+
+        <include layout="@layout/placeholder_movie_image"
+            android:layout_width="100dp"
+            android:layout_height="145dp"
+            android:id="@+id/placeholder_movie_poster"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="-25dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageview_movie_backdrop" />
 
         <ImageView
             android:id="@+id/imageview_movie_poster"
@@ -29,8 +46,7 @@
             android:scaleType="centerCrop"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imageview_movie_backdrop"
-            tools:ignore="ContentDescription"
-            tools:src="@mipmap/ic_launcher" />
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/imageview_star"
