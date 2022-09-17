@@ -1,6 +1,7 @@
 package com.example.simplemovieapp.di
 
 import android.content.Context
+import androidx.room.Room
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -13,10 +14,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
@@ -29,13 +33,25 @@ object AppModule {
         @ApplicationContext context: Context
     ) = Glide.with(context).setDefaultRequestOptions(
         RequestOptions()
-//            .placeholder(R.layout.placeholder_movie_image)
             .diskCacheStrategy(DiskCacheStrategy.DATA)
     )
 
+//    @Singleton
+//    @Provides
+//    fun provideDatabaseObject(@ApplicationContext context: Context) = MovieDatabase.invoke(context)
+
     @Singleton
     @Provides
-    fun provideDatabaseObject(@ApplicationContext context: Context) = MovieDatabase.invoke(context)
+    fun provideDatabaseObject(
+        @ApplicationContext context: Context,
+        callback: MovieDatabase.Callback
+    ) = Room.databaseBuilder(context, MovieDatabase::class.java, "movie_db.db")
+        .fallbackToDestructiveMigration()
+        .addCallback(callback)
+        .build()
+
+    @Provides
+    fun provideMovieDao(db: MovieDatabase) = db.getMovieDao()
 
     @Singleton
     @Provides
@@ -65,4 +81,13 @@ object AppModule {
         networkService: MoviesService
     ) = MoviesRepository(context, database, networkService)
 
+    @ApplicationScope
+    @Singleton
+    @Provides
+    fun provideApplicationScope() = CoroutineScope(SupervisorJob())
+
 }
+
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+annotation class ApplicationScope
