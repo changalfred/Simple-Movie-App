@@ -20,34 +20,39 @@ class PopularMoviesViewModel @Inject constructor(
 ) : ViewModel() {
 
     var popularMoviesPage = 1
+    var shouldFetchNextMovies = true
 
     private var popularMoviesResponse: List<MoviePresentationEntity>? = null
 
     private val _popularMovies = MutableLiveData<ResourceState<List<MoviePresentationEntity>>>()
     val popularMovies: LiveData<ResourceState<List<MoviePresentationEntity>>> = _popularMovies
 
-    private val _totalPages = MutableLiveData<ResourceState<Int>>()
-    val totalPages: LiveData<ResourceState<Int>> = _totalPages
+    private val moviesStateChannel = Channel<MoviesState>()
+    val moviesState = moviesStateChannel.receiveAsFlow()
 
     private val moviesEventChannel = Channel<MoviesEvent>()
     val moviesEvent = moviesEventChannel.receiveAsFlow()
 
     fun getPopularMovies() = viewModelScope.launch {
-        _popularMovies.postValue(ResourceState.Loading())
+        if (shouldFetchNextMovies) {
+            _popularMovies.postValue(ResourceState.Loading())
 
-        try {
-            val response = repository.getPopularMovies(page = popularMoviesPage)
+            try {
+                val response = repository.getPopularMovies(page = popularMoviesPage)
 
-            // TODO: Solve double postValue(...) by making another class in data layer with first
-            // function that only gets totalPages and second function gets movies.
-            if (response != null) {
-                _totalPages.postValue(ResourceState.Success(response.totalPages))
-                val allMovies = concatPreviousResults(response.movies)
-                _popularMovies.postValue(ResourceState.Success(allMovies))
+                // TODO: Solve double postValue(...) by making another class in data layer with first
+                // function that only gets totalPages and second function gets movies.
+                if (response != null) {
+                    moviesStateChannel.send(MoviesState.Page(response.totalPages))
+                    val allMovies = concatPreviousResults(response.movies)
+                    _popularMovies.postValue(ResourceState.Success(allMovies))
+                }
+            } catch (e: Exception) {
+                Timber.d("Exception: ${e.message}, \n ${e.stackTraceToString()}")
+                ResourceState.Error(null, "Could not fetch pages and movies.")
+            } finally {
+                shouldFetchNextMovies = false
             }
-        } catch (e: Exception) {
-            Timber.d("Exception: ${e.message}, \n ${e.stackTraceToString()}")
-            ResourceState.Error(null, "Could not fetch pages and movies.")
         }
     }
 
@@ -76,6 +81,10 @@ class PopularMoviesViewModel @Inject constructor(
 
     sealed class MoviesEvent {
         data class NavigateToMovieDetailsScreen(val id: Int, val title: String) : MoviesEvent()
+    }
+
+    sealed class MoviesState {
+        data class Page(val page: Int) : MoviesState()
     }
 
 }

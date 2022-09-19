@@ -10,7 +10,8 @@ import com.example.simplemovieapp.presentation.models.MovieDetailsPresentationEn
 import com.example.simplemovieapp.utilities.NOT_SAVED
 import com.example.simplemovieapp.utilities.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -23,8 +24,8 @@ class MovieDetailsViewModel @Inject constructor(
     private val _movieDetails = MutableLiveData<ResourceState<MovieDetailsPresentationEntity>>()
     val movieDetails: LiveData<ResourceState<MovieDetailsPresentationEntity>> = _movieDetails
 
-    private val _isSaved = MutableLiveData<ResourceState<Boolean>>()
-    val isSaved: LiveData<ResourceState<Boolean>> = _isSaved
+    private val movieDetailsStateChannel = Channel<MovieDetailsState>(1)
+    val movieDetailsState = movieDetailsStateChannel.receiveAsFlow()
 
     fun getMovieDetails(id: Int) = viewModelScope.launch {
         try {
@@ -38,13 +39,9 @@ class MovieDetailsViewModel @Inject constructor(
 
     fun checkIfMovieSaved(id: Int) = viewModelScope.launch {
         repository.checkIfMovieSaved(id)
-            .catch { e ->
-                Timber.d("Exception: ${e.message}")
-                _isSaved.postValue(ResourceState.Error(null,"Could not check if movie saved."))
-            }
             .collect { isSaved ->
-                if (isSaved == NOT_SAVED) _isSaved.postValue(ResourceState.Success(false))
-                else _isSaved.postValue(ResourceState.Success(true))
+                if (isSaved == NOT_SAVED) movieDetailsStateChannel.send(MovieDetailsState.MovieIsNotSaved)
+                else movieDetailsStateChannel.send(MovieDetailsState.MovieIsSaved)
             }
     }
 
@@ -62,6 +59,11 @@ class MovieDetailsViewModel @Inject constructor(
         } catch (e: Exception) {
             Timber.d("Exception: ${e.message}")
         }
+    }
+
+    sealed class MovieDetailsState {
+        object MovieIsSaved : MovieDetailsState()
+        object MovieIsNotSaved : MovieDetailsState()
     }
 
 }

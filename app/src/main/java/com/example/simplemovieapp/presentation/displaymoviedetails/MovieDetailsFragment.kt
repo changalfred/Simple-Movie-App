@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.RequestManager
 import com.example.simplemovieapp.R
@@ -16,7 +19,11 @@ import com.example.simplemovieapp.utilities.ResourceState
 import com.example.simplemovieapp.utilities.W1280
 import com.example.simplemovieapp.utilities.W185
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+typealias MovieIsNotSaved = MovieDetailsViewModel.MovieDetailsState.MovieIsNotSaved
+typealias MovieIsSaved = MovieDetailsViewModel.MovieDetailsState.MovieIsSaved
 
 @AndroidEntryPoint
 class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
@@ -56,11 +63,25 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
     }
 
     private fun subscribeToObservables() {
+        // LiveData
         movieDetailsViewModel.movieDetails.observe(viewLifecycleOwner) { movieDetails ->
             updateScreen(movieDetails)
         }
-        movieDetailsViewModel.isSaved.observe(viewLifecycleOwner) { isSaved ->
-            setSaveButton(isSaved.data!!)
+
+        // Channels
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                movieDetailsViewModel.movieDetailsState.collect { movieDetailsState ->
+                    when (movieDetailsState) {
+                        is MovieIsNotSaved -> {
+                            displayNotSavedButton()
+                        }
+                        is MovieIsSaved -> {
+                            displaySavedButton()
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -68,14 +89,14 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_display_movie_details) {
         movieDetailsViewModel.checkIfMovieSaved(args.id)
     }
 
-    private fun setSaveButton(saved: Boolean) {
-        if (!saved) {
-            binding.imageviewSaved.visibility = View.INVISIBLE
-            binding.imageviewNotSaved.visibility = View.VISIBLE
-        } else {
-            binding.imageviewSaved.visibility = View.VISIBLE
-            binding.imageviewNotSaved.visibility = View.INVISIBLE
-        }
+    private fun displayNotSavedButton() {
+        binding.imageviewSaved.visibility = View.INVISIBLE
+        binding.imageviewNotSaved.visibility = View.VISIBLE
+    }
+
+    private fun displaySavedButton() {
+        binding.imageviewSaved.visibility = View.VISIBLE
+        binding.imageviewNotSaved.visibility = View.INVISIBLE
     }
 
     private fun addToSaved() {

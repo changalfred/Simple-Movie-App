@@ -6,7 +6,9 @@ import android.widget.AbsListView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +20,8 @@ import com.example.simplemovieapp.utilities.QUERY_SIZE_LIMIT
 import com.example.simplemovieapp.utilities.ResourceState
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -62,6 +66,7 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
                         isTotalMoreThanVisible && isScrolling
 
             if (shouldPaginate) {
+                popularMoviesViewModel.shouldFetchNextMovies = true
                 showProgressBar()
 
                 popularMoviesViewModel.getPopularMovies()
@@ -121,21 +126,36 @@ class PopularMoviesFragment : Fragment(R.layout.fragment_movies),
         popularMoviesViewModel.popularMovies.observe(viewLifecycleOwner) { popularMovies ->
             updateScreen(popularMovies)
         }
-        popularMoviesViewModel.totalPages.observe(viewLifecycleOwner) { totalPages ->
-            isLastPage = popularMoviesViewModel.popularMoviesPage == totalPages.data
+
+        // Event channel
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                popularMoviesViewModel.moviesEvent.collect { moviesEvent ->
+                    when (moviesEvent) {
+                        is PopularMoviesViewModel.MoviesEvent.NavigateToMovieDetailsScreen -> {
+                            val action =
+                                PopularMoviesFragmentDirections.actionMoviesFragmentToDisplayMovieDetailsFragment(
+                                    moviesEvent.id,
+                                    moviesEvent.title
+                                )
+                            findNavController().navigate(action)
+                        }
+                    }
+                }
+            }
         }
 
-        // Channels
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            popularMoviesViewModel.moviesEvent.collect { moviesEvent ->
-                when (moviesEvent) {
-                    is PopularMoviesViewModel.MoviesEvent.NavigateToMovieDetailsScreen -> {
-                        val action =
-                            PopularMoviesFragmentDirections.actionMoviesFragmentToDisplayMovieDetailsFragment(
-                                moviesEvent.id,
-                                moviesEvent.title
-                            )
-                        findNavController().navigate(action)
+        // State channel
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                popularMoviesViewModel.moviesState.collect { moviesState ->
+                    when (moviesState) {
+                        is PopularMoviesViewModel.MoviesState.Page -> {
+                            isLastPage =
+                                popularMoviesViewModel.popularMoviesPage == moviesState.page
+                            Timber.d("Status collect: $isLastPage")
+                        }
+                        else -> Unit
                     }
                 }
             }
